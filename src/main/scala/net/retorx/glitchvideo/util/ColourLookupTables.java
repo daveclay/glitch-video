@@ -1,14 +1,11 @@
-package net.retorx.glitchvideo;
+package net.retorx.glitchvideo.util;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.LookupOp;
 import java.awt.image.LookupTable;
 import java.awt.image.ShortLookupTable;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 
