@@ -12,8 +12,9 @@ import net.retorx.glitchvideo.glitches.GlitcherTool
 object Main {
 
     def main(args: Array[String]) = {
+        val random = new Random(new Date().getTime)
         //glitch("videos/WHUT_20100602_020000_Tavis_Smiley.mp4?t=1798%2F1828&ignore=x.mp4", "blah.mov")
-        glitch("videos/CNNW_20121222_080000_Piers_Morgan_Tonight.mp4?t=119%2F149&ignore=x.mp4", "blah.mov")
+        glitch("videos/CNNW_20121222_080000_Piers_Morgan_Tonight.mp4?t=119%2F149&ignore=x.mp4", "/Users/daveclay/SYRIA/blah" + random.nextInt(1000) + ".mov")
     }
 
     def glitch(inputFilename: String, outputFilename: String) {

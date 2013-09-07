@@ -16,7 +16,7 @@ class GlitcherTool extends MediaToolAdapter {
     var frameCount = 0
 
     //val glitcher = new ColorBandSplitter(Array(new ShiftColorBands()))
-    val glitcher = new ColorBandSplitter(Array(new XYDriftColorBands(), new NoiseColorBands()))
+    val glitcher = new ColorBandSplitter(Array(new XYDriftColorBands(), new LinesColorBands()))
 
     override def onVideoPicture(event: IVideoPictureEvent) {
         if (frameGlitchCount >= framesToGlitch) {

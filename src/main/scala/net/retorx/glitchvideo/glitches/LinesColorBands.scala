@@ -16,7 +16,7 @@ class LinesColorBands extends ColorBandHandler with RandomShit {
     }
 
     def handleBands(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
-        if (line == image.getHeight()) {
+        if (line == image.getHeight) {
             line = 0
         }
         if (line == y) {

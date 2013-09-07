@@ -10,11 +10,14 @@ class XYDriftColorBands extends ColorBandHandler with RandomShit {
     var shift1 = 0
     var shift2 = 0
     var shift3 = 0
+    var rx = 0
+    var trigger = false
 
     def notifyOfNextFrame() {
         shift1 = shift1 + 1
         shift2 = shift2 + 2
         shift3 = shift3 + 4
+        trigger = random.nextInt(100) > 90
     }
 
     def reset() {
@@ -32,7 +35,12 @@ class XYDriftColorBands extends ColorBandHandler with RandomShit {
         shift2 = wrap(shift2, height)
         shift3 = wrap(shift3, height)
 
-        var rx = wrap(x + shift1 + 80, width)
+        if (trigger) {
+            rx = wrap(x + random.nextInt(width), width) // shift x by some random number
+        } else {
+            rx = x
+        }
+
         var ry = wrap(y + shift1, height)
         var gy = wrap(y + shift2, height)
         var by = wrap(y + shift3, height)
