@@ -1,9 +1,10 @@
-package net.retorx.glitchvideo.glitches
+package net.retorx.glitchvideo.glitches.colorbands
 
 import java.awt.image.BufferedImage
 import net.retorx.glitchvideo.util.RandomShit
+import net.retorx.glitchvideo.glitches.routing.ColorBandHandler
 
-class LinesColorBands extends ColorBandHandler with RandomShit {
+class NoiseLinesSingleColorBands extends ColorBandHandler with RandomShit {
 
     var line = 0;
 

@@ -5,6 +5,9 @@ import net.retorx.glitchvideo.util.RandomShit
 
 trait RandomImageGlitcher extends RandomShit {
 
+    var width = 0
+    var height = 0
+
     def handleImage(image: BufferedImage)
 
     def updateImage(image: BufferedImage) {

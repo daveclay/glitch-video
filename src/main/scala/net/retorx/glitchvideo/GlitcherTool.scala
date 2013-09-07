@@ -1,8 +1,12 @@
-package net.retorx.glitchvideo.glitches
+package net.retorx.glitchvideo
 
 import com.xuggle.mediatool.MediaToolAdapter
 import java.util.{Date, Random}
 import com.xuggle.mediatool.event.IVideoPictureEvent
+import net.retorx.glitchvideo.glitches.routing.{ApplyAll, GlitchOption, ApplyRandom, ApplyAllColorBands}
+import net.retorx.glitchvideo.glitches.colorbands._
+import net.retorx.glitchvideo.glitches.{Rescan, Noise}
+import net.retorx.glitchvideo.glitches.routing.GlitchOption
 
 class GlitcherTool extends MediaToolAdapter {
 
@@ -16,7 +20,22 @@ class GlitcherTool extends MediaToolAdapter {
     var frameCount = 0
 
     //val glitcher = new ColorBandSplitter(Array(new ShiftColorBands()))
-    val glitcher = new ColorBandSplitter(Array(new XYDriftColorBands(), new LinesColorBands()))
+    val applyAllColorBands = new ApplyAllColorBands(Array(
+        new DriftColorBands(),
+        new NoiseLinesSingleColorBands()
+    ))
+
+    val applyRandom = new ApplyRandom(List(
+        GlitchOption(applyAllColorBands, 100),
+        GlitchOption(new Noise(), 20)
+    ))
+
+    val applyAll = new ApplyAll(List(
+        new Rescan(),
+        applyRandom
+    ))
+
+    val glitcher = applyAll // applyRandom // new Rescan()
 
     override def onVideoPicture(event: IVideoPictureEvent) {
         if (frameGlitchCount >= framesToGlitch) {
@@ -28,7 +47,10 @@ class GlitcherTool extends MediaToolAdapter {
 
         if (frameGlitchCount > 0 || random.nextInt(100) > 3) {
             val image = event.getImage
+            val data = image.getData
 
+            glitcher.width = data.getWidth
+            glitcher.height = data.getHeight
             glitcher.handleImage(image)
 
             frameGlitchCount = frameGlitchCount + 1

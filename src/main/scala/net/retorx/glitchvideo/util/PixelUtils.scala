@@ -5,9 +5,11 @@ import java.awt.image.BufferedImage
 object PixelUtils {
 
     def main(args: Array[String]) {
-        println(wrap(360, 359))
+        println(wrap(359, 360))
         println(wrap(360, 360))
-        println(wrap(360, 361))
+        println(wrap(361, 360))
+        println(wrap(0, 300))
+        println(wrap(1, 300))
     }
 
     def wrap(value: Int, max: Int) = {
