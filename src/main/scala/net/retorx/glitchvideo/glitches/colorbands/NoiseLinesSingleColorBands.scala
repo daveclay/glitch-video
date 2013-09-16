@@ -5,12 +5,14 @@ import net.retorx.glitchvideo.util.PixelUtils._
 import net.retorx.glitchvideo.util.{GREEN, RED, Color, RandomShit}
 import net.retorx.glitchvideo.glitches.routing.PixelGlitcher
 
-class NoiseLinesSingleColorBands(thickness: Int = 1, colorBand: Color = RED) extends PixelGlitcher with RandomShit {
+class NoiseLinesSingleColorBands(lineThickness: Int = 1, colorBand: Color = RED) extends PixelGlitcher with RandomShit {
 
     var line = 0
+    var thickness = 0
 
     def notifyOfNextFrame() {
         line += 1
+        thickness = getThickness
     }
 
     def getFramePixel(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
@@ -24,4 +26,6 @@ class NoiseLinesSingleColorBands(thickness: Int = 1, colorBand: Color = RED) ext
             r | g | b
         }
     }
+
+    def getThickness = thickness
 }

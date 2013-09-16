@@ -6,13 +6,18 @@ import net.retorx.glitchvideo.glitches.RandomImageGlitcher
 class ApplyAllColorBands(colorBandGlitchers: Array[PixelGlitcher]) extends RandomImageGlitcher {
 
     def handleFrameImage(source: BufferedImage, destination: BufferedImage) {
+
+        colorBandGlitchers.foreach(glitcher => {
+            glitcher.height = height
+            glitcher.width = width
+            glitcher.notifyOfNextFrame()
+        })
+
         for (x <- 0 to (width - 1)) {
             for (y <- 0 to (height - 1)) {
                 var pixel = source.getRGB(x, y)
 
                 colorBandGlitchers.foreach(glitcher => {
-                    glitcher.height = height
-                    glitcher.width = width
 
                     val r = pixel & 0xFF0000
                     val g = pixel & 0xFF00
@@ -24,10 +29,6 @@ class ApplyAllColorBands(colorBandGlitchers: Array[PixelGlitcher]) extends Rando
                 destination.setRGB(x, y, pixel)
             }
         }
-
-        colorBandGlitchers.foreach(glitcher => {
-            glitcher.notifyOfNextFrame()
-        })
     }
 
     def split(pixel: Int) {

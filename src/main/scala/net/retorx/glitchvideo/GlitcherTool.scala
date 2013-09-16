@@ -15,7 +15,7 @@ class GlitcherTool extends MediaToolAdapter {
     //val glitcher = new ColorBandSplitter(Array(new ShiftColorBands()))
     val applyAllColorBands = new ApplyAllColorBands(Array(
         new DriftColorBands(),
-        new RandomNoiseLinesSingleColorBands(thickness = 1)
+        new RandomNoiseLinesSingleColorBands()
     ))
 
     val applyRandom = new ApplyRandom(List(
