@@ -9,9 +9,8 @@ trait ShiftDirection
 object Vertical extends ShiftDirection
 object Horizontal extends ShiftDirection
 
-abstract class AbstractShiftColorBands extends PixelGlitcher with RandomShit {
+abstract class AbstractShiftColorBands(shiftDirection: ShiftDirection = Horizontal) extends PixelGlitcher with RandomShit {
 
-    var shiftDirection = Horizontal
     var maxShift = 1
 
     var shift1 = 0
@@ -20,8 +19,9 @@ abstract class AbstractShiftColorBands extends PixelGlitcher with RandomShit {
     notifyOfNextFrame()
 
     def getFramePixel(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
+        notifyOfNextPixel()
         maxShift = height - 1
-        if (shiftDirection == Vertical) {
+        if (shiftDirection == Horizontal) {
             var ry = wrap(y + shift1, height)
             var gy = wrap(y + shift2, height)
             var by = wrap(y + shift3, height)
@@ -34,9 +34,11 @@ abstract class AbstractShiftColorBands extends PixelGlitcher with RandomShit {
             (image.getRGB(rx, y) & 0xFF0000) | (image.getRGB(gx, y) & 0xFF00) | (image.getRGB(bx, y) & 0xFF)
         }
     }
+
+    def notifyOfNextPixel() { }
 }
 
-class RandomlyShiftColorBands extends AbstractShiftColorBands with RandomShit {
+class PeriodicallyRandomlyShiftFrameColorBands(shiftDirection: ShiftDirection = Horizontal) extends AbstractShiftColorBands(shiftDirection) with RandomShit {
 
     def randomShift() {
         shift1 = random.nextInt(maxShift)
@@ -50,6 +52,22 @@ class RandomlyShiftColorBands extends AbstractShiftColorBands with RandomShit {
         }
     }
 }
+
+/**
+ * weight: 99900: roughly 1 to 10 pixel wide strips
+ * weight: 99990: roughly 10 to 100 pixel wide strips
+ * @param weight
+ * @param shiftDirection
+ */
+class RandomlyShiftColorBands(weight:Int = 99900, shiftDirection: ShiftDirection = Horizontal) extends PeriodicallyRandomlyShiftFrameColorBands(shiftDirection) with RandomShit {
+
+    override def notifyOfNextPixel() {
+        if (random.nextInt(100000) > weight) {
+            randomShift()
+        }
+    }
+}
+
 class ProgressivelyShiftColorBands extends AbstractShiftColorBands with RandomShit {
 
     def progressiveShift() {
