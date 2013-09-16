@@ -68,7 +68,7 @@ class RandomlyShiftColorBands(weight:Int = 99900, shiftDirection: ShiftDirection
     }
 }
 
-class OscillatePixelationOfColorBands(shiftDirection: ShiftDirection = Horizontal) extends PeriodicallyRandomlyShiftFrameColorBands(shiftDirection) with RandomShit {
+class OscillatePxelationOfColorBands(shiftDirection: ShiftDirection = Horizontal) extends PeriodicallyRandomlyShiftFrameColorBands(shiftDirection) with RandomShit {
 
     var weight = 0
     var frameCount = 0
@@ -77,6 +77,15 @@ class OscillatePixelationOfColorBands(shiftDirection: ShiftDirection = Horizonta
 
     override def notifyOfNextFrame() {
         super.notifyOfNextFrame()
+
+        /**
+         * we define static parameters of some function... the function is the static part we compile, the parametes we
+         * apply by reading dynamic state. apply an lfo. applying the lfo requires code, to what reuiqred config.
+         *
+         * what is compilatin, what can be tweaked?
+         * lfo applied to x, and y, randomness to this, pixels to that.
+         * We can fake it by programming with our minds.
+         **/
         weight = 99900 + SineWave.getValue(frameCount, period, weightValueRange)
         frameCount += 1
         if (frameCount > period) {
