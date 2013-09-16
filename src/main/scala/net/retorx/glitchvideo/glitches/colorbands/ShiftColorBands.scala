@@ -3,16 +3,40 @@ package net.retorx.glitchvideo.glitches.colorbands
 import java.awt.image.BufferedImage
 import net.retorx.glitchvideo.util.RandomShit
 import net.retorx.glitchvideo.util.PixelUtils._
-import net.retorx.glitchvideo.glitches.routing.ColorBandHandler
+import net.retorx.glitchvideo.glitches.routing.PixelGlitcher
 
-class ShiftColorBands extends ColorBandHandler with RandomShit {
+trait ShiftDirection
+object Vertical extends ShiftDirection
+object Horizontal extends ShiftDirection
 
+abstract class AbstractShiftColorBands extends PixelGlitcher with RandomShit {
+
+    var shiftDirection = Horizontal
     var maxShift = 1
 
     var shift1 = 0
     var shift2 = 0
     var shift3 = 0
-    randomShift()
+    notifyOfNextFrame()
+
+    def getFramePixel(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
+        maxShift = height - 1
+        if (shiftDirection == Vertical) {
+            var ry = wrap(y + shift1, height)
+            var gy = wrap(y + shift2, height)
+            var by = wrap(y + shift3, height)
+
+            (image.getRGB(x, ry) & 0xFF0000) | (image.getRGB(x, gy) & 0xFF00) | (image.getRGB(x, by) & 0xFF)
+        } else {
+            var rx = wrap(x + shift1, width)
+            var gx = wrap(x + shift2, width)
+            var bx = wrap(x + shift3, width)
+            (image.getRGB(rx, y) & 0xFF0000) | (image.getRGB(gx, y) & 0xFF00) | (image.getRGB(bx, y) & 0xFF)
+        }
+    }
+}
+
+class RandomlyShiftColorBands extends AbstractShiftColorBands with RandomShit {
 
     def randomShift() {
         shift1 = random.nextInt(maxShift)
@@ -25,22 +49,18 @@ class ShiftColorBands extends ColorBandHandler with RandomShit {
             randomShift()
         }
     }
+}
+class ProgressivelyShiftColorBands extends AbstractShiftColorBands with RandomShit {
 
-    def handleBands(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
+    def progressiveShift() {
+        shift1 += 1
+        shift2 += 1
+        shift3 += 1
+    }
 
-        val width = image.getWidth
-        val height = image.getHeight
-        maxShift = height - 1
-
-        var rx = wrap(x + shift1, width)
-        var gx = wrap(x + shift2, width)
-        var bx = wrap(x + shift3, width)
-
-        var ry = wrap(y + shift1, height)
-        var gy = wrap(y + shift2, height)
-        var by = wrap(y + shift3, height)
-
-        //(image.getRGB(rx, y) & 0xFF0000) | (image.getRGB(gx, y) & 0xFF00) | (image.getRGB(bx, y) & 0xFF)
-        (image.getRGB(x, ry) & 0xFF0000) | (image.getRGB(x, gy) & 0xFF00) | (image.getRGB(x, by) & 0xFF)
+    def notifyOfNextFrame() {
+        progressiveShift()
     }
 }
+
+

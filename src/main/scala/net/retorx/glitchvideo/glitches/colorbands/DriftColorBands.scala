@@ -3,9 +3,9 @@ package net.retorx.glitchvideo.glitches.colorbands
 import java.awt.image.BufferedImage
 import net.retorx.glitchvideo.util.RandomShit
 import net.retorx.glitchvideo.util.PixelUtils._
-import net.retorx.glitchvideo.glitches.routing.ColorBandHandler
+import net.retorx.glitchvideo.glitches.routing.PixelGlitcher
 
-class DriftColorBands extends ColorBandHandler with RandomShit {
+class DriftColorBands extends PixelGlitcher with RandomShit {
 
     var maxShift = 1
     var shift1 = 0
@@ -27,7 +27,7 @@ class DriftColorBands extends ColorBandHandler with RandomShit {
         shift3 = 0
     }
 
-    def handleBands(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
+    def getFramePixel(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
         maxShift = height
         shift1 = wrap(shift1, height)
         shift2 = wrap(shift2, height)

@@ -20,7 +20,7 @@ object PixelUtils {
         }
     }
 
-    def copy(image:BufferedImage) = {
+    def copyImage(image:BufferedImage) = {
         val cm = image.getColorModel()
         val isAlphaPremultiplied = cm.isAlphaPremultiplied()
         val raster = image.copyData(null)

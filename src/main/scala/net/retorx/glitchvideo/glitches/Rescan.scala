@@ -21,7 +21,7 @@ class Rescan extends RandomImageGlitcher {
         }
     }
 
-    override def handleImage(image: BufferedImage) {
+    override def handleFrameImage(image: BufferedImage, destination: BufferedImage) {
         incrementCounters()
 
         val fadeOriginal = random.nextBoolean()
@@ -33,13 +33,11 @@ class Rescan extends RandomImageGlitcher {
                 val ty = PixelUtils.wrap(shiftAmount + y, height)
                 val pixel = image.getRGB(x, ty)
                 if (fadeOriginal) {
-                    image.setRGB(x, y, originalPixel | pixel)
+                    destination.setRGB(x, y, originalPixel | pixel)
                 } else {
-                    image.setRGB(x, y, pixel)
+                    destination.setRGB(x, y, pixel)
                 }
             }
         }
-
-        updateImage(image)
     }
 }

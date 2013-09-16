@@ -19,11 +19,11 @@ class ApplyRandom(options: List[GlitchOption]) extends RandomImageGlitcher {
         addGlitcherByWeight(glitchers, option)
     })
 
-    def handleImage(image: BufferedImage) {
+    def handleFrameImage(source: BufferedImage, destination: BufferedImage) {
         val idx = random.nextInt(array.size)
         val glitcher = array(idx)
         glitcher.width = width
         glitcher.height = height
-        glitcher.handleImage(image)
+        glitcher.handleFrameImage(source, destination)
     }
 }

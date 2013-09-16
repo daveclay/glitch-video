@@ -6,11 +6,11 @@ import net.retorx.glitchvideo.glitches.RandomImageGlitcher
 
 class ApplyAll(glitchers: List[RandomImageGlitcher]) extends RandomImageGlitcher {
 
-    def handleImage(image: BufferedImage) {
+    def handleFrameImage(source: BufferedImage, destination: BufferedImage) {
         glitchers.foreach(glitcher => {
             glitcher.width = width
             glitcher.height = height
-            glitcher.handleImage(image)
+            glitcher.handleFrameImage(source, destination)
         })
     }
 }
