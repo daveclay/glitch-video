@@ -1,7 +1,7 @@
 package net.retorx.glitchvideo.glitches.colorbands
 
 import java.awt.image.BufferedImage
-import net.retorx.glitchvideo.util.RandomShit
+import net.retorx.glitchvideo.util.{SineWave, RandomShit}
 import net.retorx.glitchvideo.util.PixelUtils._
 import net.retorx.glitchvideo.glitches.routing.PixelGlitcher
 
@@ -60,6 +60,29 @@ class PeriodicallyRandomlyShiftFrameColorBands(shiftDirection: ShiftDirection = 
  * @param shiftDirection
  */
 class RandomlyShiftColorBands(weight:Int = 99900, shiftDirection: ShiftDirection = Horizontal) extends PeriodicallyRandomlyShiftFrameColorBands(shiftDirection) with RandomShit {
+
+    override def notifyOfNextPixel() {
+        if (random.nextInt(100000) > weight) {
+            randomShift()
+        }
+    }
+}
+
+class OscillatePixelationOfColorBands(shiftDirection: ShiftDirection = Horizontal) extends PeriodicallyRandomlyShiftFrameColorBands(shiftDirection) with RandomShit {
+
+    var weight = 0
+    var frameCount = 0
+    var period = 60 // every 2 seconds
+    var weightValueRange = 100
+
+    override def notifyOfNextFrame() {
+        super.notifyOfNextFrame()
+        weight = 99900 + SineWave.getValue(frameCount, period, weightValueRange)
+        frameCount += 1
+        if (frameCount > period) {
+            frameCount = 0
+        }
+    }
 
     override def notifyOfNextPixel() {
         if (random.nextInt(100000) > weight) {
