@@ -30,8 +30,4 @@ class ApplyAllColorBands(colorBandGlitchers: Array[PixelGlitcher]) extends Rando
             }
         }
     }
-
-    def split(pixel: Int) {
-
-    }
 }

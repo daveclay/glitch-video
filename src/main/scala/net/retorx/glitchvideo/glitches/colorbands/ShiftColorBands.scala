@@ -1,116 +1,47 @@
 package net.retorx.glitchvideo.glitches.colorbands
 
 import java.awt.image.BufferedImage
-import net.retorx.glitchvideo.util.{SineWave, RandomShit}
 import net.retorx.glitchvideo.util.PixelUtils._
 import net.retorx.glitchvideo.glitches.routing.PixelGlitcher
+import net.retorx.glitchvideo.modulation.ModulatedIntValue
 
 trait ShiftDirection
 object Vertical extends ShiftDirection
 object Horizontal extends ShiftDirection
 
-abstract class AbstractShiftColorBands(shiftDirection: ShiftDirection = Horizontal) extends PixelGlitcher with RandomShit {
-
-    var maxShift = 1
-
-    var shift1 = 0
-    var shift2 = 0
-    var shift3 = 0
-    notifyOfNextFrame()
+/**
+ * A PixelGlitcher that shifts the red, green, and blue pixels in each frame by some distance. By modulating the
+ * distance, you can shift either entire frames or individual pixels, causing different types effects.
+ *
+ * @param shiftDirection
+ * @param redShiftAmount
+ * @param greenShiftAmount
+ * @param blueShiftAmount
+ */
+class ShiftColorBands(shiftDirection: ShiftDirection = Horizontal,
+                      redShiftAmount: ModulatedIntValue,
+                      greenShiftAmount: ModulatedIntValue,
+                      blueShiftAmount: ModulatedIntValue)
+                      extends PixelGlitcher {
 
     def getFramePixel(r: Int, g: Int, b: Int, x: Int, y: Int, image: BufferedImage): Int = {
-        notifyOfNextPixel()
-        maxShift = height - 1
         if (shiftDirection == Horizontal) {
-            var ry = wrap(y + shift1, height)
-            var gy = wrap(y + shift2, height)
-            var by = wrap(y + shift3, height)
+            var ry = wrap(y + redShiftAmount(), height)
+            var gy = wrap(y + greenShiftAmount(), height)
+            var by = wrap(y + blueShiftAmount(), height)
 
             (image.getRGB(x, ry) & 0xFF0000) | (image.getRGB(x, gy) & 0xFF00) | (image.getRGB(x, by) & 0xFF)
         } else {
-            var rx = wrap(x + shift1, width)
-            var gx = wrap(x + shift2, width)
-            var bx = wrap(x + shift3, width)
+            var rx = wrap(x + redShiftAmount(), width)
+            var gx = wrap(x + greenShiftAmount(), width)
+            var bx = wrap(x + blueShiftAmount(), width)
             (image.getRGB(rx, y) & 0xFF0000) | (image.getRGB(gx, y) & 0xFF00) | (image.getRGB(bx, y) & 0xFF)
         }
     }
 
-    def notifyOfNextPixel() { }
-}
+    def notifyOfNextPixel() {}
+    def notifyOfNextFrame() {}
 
-class PeriodicallyRandomlyShiftFrameColorBands(shiftDirection: ShiftDirection = Horizontal) extends AbstractShiftColorBands(shiftDirection) with RandomShit {
-
-    def randomShift() {
-        shift1 = random.nextInt(maxShift)
-        shift2 = random.nextInt(maxShift)
-        shift3 = random.nextInt(maxShift)
-    }
-
-    def notifyOfNextFrame() {
-        if (random.nextInt(100) > 92) {
-            randomShift()
-        }
-    }
-}
-
-/**
- * weight: 99900: roughly 1 to 10 pixel wide strips
- * weight: 99990: roughly 10 to 100 pixel wide strips
- * @param weight
- * @param shiftDirection
- */
-class RandomlyShiftColorBands(weight:Int = 99900, shiftDirection: ShiftDirection = Horizontal) extends PeriodicallyRandomlyShiftFrameColorBands(shiftDirection) with RandomShit {
-
-    override def notifyOfNextPixel() {
-        if (random.nextInt(100000) > weight) {
-            randomShift()
-        }
-    }
-}
-
-class OscillatePxelationOfColorBands(shiftDirection: ShiftDirection = Horizontal) extends PeriodicallyRandomlyShiftFrameColorBands(shiftDirection) with RandomShit {
-
-    var weight = 0
-    var frameCount = 0
-    var period = 60 // every 2 seconds
-    var weightValueRange = 100
-
-    override def notifyOfNextFrame() {
-        super.notifyOfNextFrame()
-
-        /**
-         * we define static parameters of some function... the function is the static part we compile, the parametes we
-         * apply by reading dynamic state. apply an lfo. applying the lfo requires code, to what reuiqred config.
-         *
-         * what is compilatin, what can be tweaked?
-         * lfo applied to x, and y, randomness to this, pixels to that.
-         * We can fake it by programming with our minds.
-         **/
-        weight = 99900 + SineWave.getValue(frameCount, period, weightValueRange)
-        frameCount += 1
-        if (frameCount > period) {
-            frameCount = 0
-        }
-    }
-
-    override def notifyOfNextPixel() {
-        if (random.nextInt(100000) > weight) {
-            randomShift()
-        }
-    }
-}
-
-class ProgressivelyShiftColorBands extends AbstractShiftColorBands with RandomShit {
-
-    def progressiveShift() {
-        shift1 += 1
-        shift2 += 1
-        shift3 += 1
-    }
-
-    def notifyOfNextFrame() {
-        progressiveShift()
-    }
 }
 
 
