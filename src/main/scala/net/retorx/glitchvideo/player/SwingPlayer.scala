@@ -11,7 +11,7 @@ import com.xuggle.mediatool.event.IVideoPictureEvent
 import net.retorx.glitchvideo.GlitcherTool
 import java.util.{Date, Random}
 
-class PlayerUI(filename: String) {
+class SwingPlayer(filename: String) {
 
     val random = new Random(new Date().getTime)
     val outputFilename = "/Users/daveclay/SYRIA/blah" + random.nextInt(1000) + ".mov"
@@ -38,7 +38,7 @@ class VideoImageComponent(width: Int, height: Int, imageSource: ImageSource) ext
     setPreferredSize(new Dimension(width, height))
 
     def animate() {
-        val framesPerSecond = 30
+        val framesPerSecond = 50
         val delay = 1000 / framesPerSecond
         val timer = new Timer(delay, null)
 

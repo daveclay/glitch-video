@@ -12,6 +12,7 @@ import net.retorx.glitchvideo.glitches.routing.GlitchOption
 
 class GlitcherTool extends MediaToolAdapter {
 
+    var start = 0L
     var frameCount = 0
 
     val modulationSync = new ModulationSynchronizer()
@@ -47,14 +48,9 @@ class GlitcherTool extends MediaToolAdapter {
     val glitcher = applyAll // applyRandom // new Rescan()
 
     override def onVideoPicture(event: IVideoPictureEvent) {
-
-        /*
-            TODO: ticks must be configurable.
-            ticks can happen on each frame, each pixel of each frame, maybe arbitrarily?
-            Can the tick configuration be modulated? Sure.
-
-            The thing that triggers the ticks - it needs access to each frame and each pixel of each frame.
-         */
+        if (start == 0) {
+            start = System.currentTimeMillis()
+        }
 
         val image = event.getImage
         val data = image.getData
@@ -63,16 +59,27 @@ class GlitcherTool extends MediaToolAdapter {
         glitcher.height = data.getHeight
 
         val destination = copyImage(image)
+
+        /*
+            TODO: ticks must be configurable.
+            ticks can happen on each frame, each pixel of each frame, maybe arbitrarily?
+            Can the tick configuration be modulated? Sure.
+
+            The thing that triggers the ticks - it needs access to each frame and each pixel of each frame.
+         */
         modulationSync.tick()
+
         glitcher.handleFrameImage(image, destination)
 
-        // paint destination on the original
+        // paint destination on the original (TODO: do I have to?)
         val g = image.createGraphics()
         g.drawImage(destination, 0, 0, null)
-
-        frameCount = frameCount + 1
+        frameCount += 1
         if (frameCount % 30 == 0) {
-            println("Glitched " + frameCount + " frames")
+            val now = System.currentTimeMillis()
+            val average = ((now - start) / frameCount)
+            val fps = 1000 / average
+            println(frameCount + " frames " + (now - start) + "ms @ " + average + " per frame " + fps + " fps")
         }
 
         super.onVideoPicture(event)

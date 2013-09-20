@@ -2,7 +2,7 @@ package net.retorx.glitchvideo.player
 
 import com.xuggle.mediatool.ToolFactory
 
-class Player(filename: String) {
+class XugglePlayer(filename: String) {
 
     def play() {
         playAfterWaiting(0)
@@ -26,13 +26,13 @@ class Player(filename: String) {
     }
 }
 
-object Player {
+object XugglePlayer {
     def play(filename: String) {
         playAfter(filename, 0)
     }
 
     def playAfter(filename: String, seconds: Int) {
-        val player = new Player(filename)
+        val player = new XugglePlayer(filename)
         player.playAfterWaiting(seconds)
     }
 }
