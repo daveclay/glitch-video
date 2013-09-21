@@ -17,19 +17,41 @@ class SwingPlayer(filename: String) {
     val outputFilename = "/Users/daveclay/SYRIA/blah" + random.nextInt(1000) + ".mov"
 
     def play() {
-        val jframe = new JFrame("Player")
-        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-
         val imageSource = new ImageSourceAdapter()
         val videoComponent = new VideoImageComponent(649, 480, imageSource)
-        jframe.setContentPane(videoComponent)
-        jframe.pack()
-        jframe.setVisible(true)
 
+        SwingUIHelper.openInFrame(videoComponent)
         videoComponent.animate()
 
         val glitchPlayer = new GlitchPlayer(imageSource)
         glitchPlayer.glitch(filename, outputFilename)
+    }
+}
+
+object SwingUIHelper {
+    def openInFrame(panel: JPanel) {
+        val jframe = new JFrame("Player")
+        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+        jframe.setContentPane(panel)
+        jframe.pack()
+        jframe.setVisible(true)
+    }
+}
+
+object ImageViewerUI {
+    def open(image:BufferedImage) {
+        SwingUIHelper.openInFrame(new ImageComponent(image))
+    }
+}
+
+class ImageComponent(image: BufferedImage) extends JPanel {
+    val data = image.getRaster
+    private val iWidth = data.getWidth
+    private val iHeight = data.getHeight
+    setPreferredSize(new Dimension(iWidth, iHeight))
+
+    override def paintComponent(graphics: Graphics) {
+        graphics.drawImage(image, 0, 0, null)
     }
 }
 

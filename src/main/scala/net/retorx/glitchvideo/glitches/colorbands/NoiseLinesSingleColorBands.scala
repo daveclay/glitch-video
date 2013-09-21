@@ -21,7 +21,7 @@ class NoiseLinesSingleColorBands(lineThickness: Int = 1, colorBand: Color = RED)
         }
 
         if (line >= y && line <= (y + thickness)) {
-            colorBand.partiallyFuck(r, g, b)
+            colorBand.partiallyFuck(r.toByte, g.toByte, b.toByte)
         } else {
             r | g | b
         }

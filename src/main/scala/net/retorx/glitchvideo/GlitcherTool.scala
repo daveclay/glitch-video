@@ -71,7 +71,11 @@ class GlitcherTool extends MediaToolAdapter {
 
         glitcher.handleFrameImage(image, destination)
 
-        // paint destination on the original (TODO: do I have to?)
+        // paint destination on the original
+        // TODO: This could just push the dest image to the player, but it'd skip the writing of the file... it could
+        // push the dest image and then write the file... but that's allon this thread, meaning this thread is not going
+        // to get to the next frame anytime soon.
+
         val g = image.createGraphics()
         g.drawImage(destination, 0, 0, null)
         frameCount += 1

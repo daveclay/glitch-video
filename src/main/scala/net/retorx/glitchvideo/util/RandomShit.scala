@@ -3,7 +3,7 @@ package net.retorx.glitchvideo.util
 import java.util.{Date, Random}
 
 object RandomShit extends RandomShit {
-    def randomColorValue() = random.nextInt(255)
+    def randomColorValue() = random.nextInt(255).toByte
 }
 
 trait RandomShit {
