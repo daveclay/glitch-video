@@ -103,9 +103,14 @@ class BufferedFrameImage(image: BufferedImage) extends FrameImage {
         val y = 0
         val band = color.getBand
         val nullDest: Array[Int] = null
-        // hrm, weird, this is the entire image, shifted on the x axis. I'd have to re-sort the samples to do the y axis.
+
+        // Todo: do some logic for x/y shifting
+        // val yDistance = bufferedFrameImage.width * (bufferedFrameImage.height / 2)
+        // the samples array is an element per pixel across the image, left to right, the width defined by the scanline.
+        // to limit the distance x we need to constrain and wrap around the distance by the image width, for each
+        // scanline. To shift y, we need to do multiples of the scanline.
+
         val samples = raster.getSamples(x, y, width, height, band, nullDest)
-        // val samples = data.getSampleModel.getSamples(x, y, width, height, band, nullDest, data.getDataBuffer)
         val dest = PixelUtils.shift(samples, distanceX)
         raster.setSamples(x, y, width, height, band, dest)
     }
