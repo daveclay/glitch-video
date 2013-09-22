@@ -8,12 +8,15 @@ trait Color {
     def set(rgb: Int, value: Byte): Int
     def fuck(r: Byte, g: Byte, b: Byte): Int
     def partiallyFuck(r: Byte, g:Byte, b: Byte): Int
+    def getBand: Int
 
     def unapply(color: Color):Color = color
     def apply(color: Color): Color = color
 }
 
 object RED extends Color {
+
+    def getBand: Int = 0
 
     def getColorInPixel(rgb: Int) = (rgb & 0xff).toByte
 
@@ -34,6 +37,8 @@ object RED extends Color {
 
 object GREEN extends Color {
 
+    def getBand: Int = 1
+
     def getColorInPixel(rgb: Int) = ((rgb & 0xff00) >> 8).toByte
 
     def shiftValueToPixel(value: Byte) = value << 8
@@ -52,6 +57,8 @@ object GREEN extends Color {
 }
 
 object BLUE extends Color {
+
+    def getBand: Int = 3
 
     def getColorInPixel(rgb: Int) = ((rgb & 0xff0000) >> 16).toByte
 

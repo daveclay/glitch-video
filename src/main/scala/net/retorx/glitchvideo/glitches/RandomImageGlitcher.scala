@@ -11,3 +11,7 @@ trait RandomImageGlitcher extends RandomShit {
 
     def handleFrameImage(source: BufferedImage, destination: BufferedImage)
 }
+
+trait FrameHandler {
+    def handleFrame(frameImage: FrameImage)
+}

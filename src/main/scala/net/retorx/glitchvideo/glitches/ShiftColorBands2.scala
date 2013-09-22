@@ -9,12 +9,10 @@ class ShiftColorBands2(shiftDirection: ShiftDirection = Horizontal,
                        redShiftAmount: ModulatedIntValue,
                        greenShiftAmount: ModulatedIntValue,
                        blueShiftAmount: ModulatedIntValue)
-        extends RandomImageGlitcher {
+        extends FrameHandler {
 
-    def handleFrameImage(source: BufferedImage, destination: BufferedImage) {
+    def handleFrame(frameImage: FrameImage) {
         if (redShiftAmount() > 0) {
-            // arraycopy
-            // getColumnArray
         }
     }
 }

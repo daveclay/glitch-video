@@ -1,6 +1,6 @@
 package net.retorx.glitchvideo.player
 
-import java.awt.{Graphics, Dimension, Component}
+import java.awt.{Image, Graphics, Dimension, Component}
 import java.awt.image.BufferedImage
 import javax.swing.{JPanel, Timer, JFrame, JApplet}
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowAdapter}
@@ -39,15 +39,19 @@ object SwingUIHelper {
 }
 
 object ImageViewerUI {
-    def open(image:BufferedImage) {
+    def open(image:Image) {
+        open(image, 0)
+    }
+
+    def open(image:Image, time:Int) {
         SwingUIHelper.openInFrame(new ImageComponent(image))
+        Thread.sleep(time)
     }
 }
 
-class ImageComponent(image: BufferedImage) extends JPanel {
-    val data = image.getRaster
-    private val iWidth = data.getWidth
-    private val iHeight = data.getHeight
+class ImageComponent(image: Image) extends JPanel {
+    private val iWidth = image.getWidth(null)
+    private val iHeight = image.getHeight(null)
     setPreferredSize(new Dimension(iWidth, iHeight))
 
     override def paintComponent(graphics: Graphics) {
