@@ -6,10 +6,11 @@ import com.xuggle.mediatool.event.IVideoPictureEvent
 import net.retorx.glitchvideo.glitches.routing.{ApplyAll, GlitchOption, ApplyRandom, ApplyAllColorBands}
 import net.retorx.glitchvideo.glitches.colorbands._
 import net.retorx.glitchvideo.glitches.routing.GlitchOption
-import net.retorx.glitchvideo.glitches.{BufferedFrameImage, FrameHandler, Rescan, Noise}
+import net.retorx.glitchvideo.glitches._
 import net.retorx.glitchvideo.modulation._
 import net.retorx.glitchvideo.glitches.routing.GlitchOption
 import java.awt.image.BufferedImage
+import net.retorx.glitchvideo.glitches.routing.GlitchOption
 
 trait FrameInfo {
 
@@ -117,7 +118,17 @@ class GlitcherTool extends ModulationTool {
 
 class FrameHandlerTool extends ModulationTool {
 
-    val frameHandler:FrameHandler = null
+    val redShiftAmount = new ModulatedIntValue(new StaticIntModulation(10))
+    val greenShiftAmount = new ModulatedIntValue(new StaticIntModulation(100))
+    val period = new ModulatedIntValue(new StaticIntModulation(30))
+    val scale = new ModulatedIntValue(new StaticIntModulation(400))
+    val lfo = new LFOIntModulation(period, scale)
+    val blueShiftAmount = new ModulatedIntValue(lfo)
+    addModulation(lfo)
+
+    var shiftColorBands = new ShiftColorBands2(Horizontal, redShiftAmount, greenShiftAmount, blueShiftAmount)
+
+    val frameHandler = shiftColorBands
 
     def handleFrameImage(image: BufferedImage) {
         frameHandler.handleFrame(new BufferedFrameImage(image))

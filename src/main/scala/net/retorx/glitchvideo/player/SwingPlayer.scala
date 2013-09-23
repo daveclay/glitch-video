@@ -8,7 +8,7 @@ import java.net.{MalformedURLException, URL}
 import java.io.File
 import com.xuggle.mediatool.{ToolFactory, MediaToolAdapter}
 import com.xuggle.mediatool.event.IVideoPictureEvent
-import net.retorx.glitchvideo.GlitcherTool
+import net.retorx.glitchvideo.{FrameHandlerTool, GlitcherTool}
 import java.util.{Date, Random}
 
 class SwingPlayer(filename: String) {
@@ -110,7 +110,7 @@ class GlitchPlayer(imageSourceAdapter: ImageSourceAdapter) {
 
         val mediaWriter = ToolFactory.makeWriter(outputFilename, mediaReader)
 
-        val glitcher = new GlitcherTool()
+        val glitcher = new FrameHandlerTool()
         mediaReader.addListener(glitcher)
         glitcher.addListener(imageSourceAdapter)
         imageSourceAdapter.addListener(mediaWriter)
