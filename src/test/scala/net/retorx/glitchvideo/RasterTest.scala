@@ -24,17 +24,19 @@ class RasterTest extends FlatSpec with DefaultExampleExpectationsListener with M
     val bufferedFrameImage = new BufferedFrameImage(bufferedImage)
 
     classOf[RasterTest].getName should "show how data is stored" in {
+        view()
+        bufferedFrameImage.shiftColorBand(RED, 0, 1)
+        view()
+    }
 
-        bufferedFrameImage.shiftColorBand(RED, 5, 0)
-        val scale = PixelUtils.scale(bufferedImage, 10, 10)
-        ImageViewerUI.open(scale)
-
-        Thread.sleep(2000)
+    private def view() {
+        ImageViewerUI.open(PixelUtils.scale(bufferedImage, 10, 10), 2000)
     }
 
     private def createImage() = {
-        ImageIO.read(getClass.getResourceAsStream("/9x9.png"))
+        ImageIO.read(getClass.getResourceAsStream("/fuck-test.jpg"))
         /*
+        val source = ImageIO.read(getClass.getResourceAsStream("/9x9.png"))
         val raster = source.getRaster
         for (x <- 0 to raster.getWidth - 1) {
             for (y <- 0 to raster.getHeight - 1) {
@@ -43,10 +45,15 @@ class RasterTest extends FlatSpec with DefaultExampleExpectationsListener with M
                     case 1 => 0x00ff00
                     case 2 => 0x0000ff
                 }
-                source.setRGB(x, y, pixel)
+                if (x == 0) {
+                    source.setRGB(x, y, pixel)
+                } else {
+                    source.setRGB(x, y, 0)
+                }
             }
         }
 
+        ImageIO.write(source, "jpeg", new File("/tmp/fuck-test.jpg"))
         source
         */
     }

@@ -13,13 +13,17 @@ import org.scalatest.matchers.ShouldMatchers
 import scala.collection.mutable.ListBuffer
 import net.retorx.glitchvideo.glitches.BufferedFrameImage
 import javax.imageio.ImageIO
-import net.retorx.glitchvideo.util.{GREEN, RED, PixelUtils}
+import net.retorx.glitchvideo.util.{BLUE, GREEN, RED, PixelUtils}
 import net.retorx.glitchvideo.player.ImageViewerUI
+import java.awt.image.BufferedImage
 
 @RunWith(classOf[JUnitRunner])
 class BufferedFrameImageTest extends FlatSpec with DefaultExampleExpectationsListener with Mockito with ShouldMatchers with OneInstancePerTest {
 
-    val bufferedImage = ImageIO.read(getClass.getResourceAsStream("/test.jpg"))
+    // val bufferedImage = ImageIO.read(getClass.getResourceAsStream("/test.jpg"))
+    // val bufferedFrameImage = new BufferedFrameImage(bufferedImage)
+
+    val bufferedImage = createTestImage()
     val bufferedFrameImage = new BufferedFrameImage(bufferedImage)
 
     classOf[BufferedFrameImageTest].getName should "shift row" in {
@@ -30,9 +34,49 @@ class BufferedFrameImageTest extends FlatSpec with DefaultExampleExpectationsLis
         shiftedRow(200) should be (originalRow(0))
     }
 
-    it should "shift a color band" in {
-        val distance = bufferedFrameImage.width * (bufferedFrameImage.height / 2)
-        bufferedFrameImage.shiftColorBand(RED, distance, 0)
-        ImageViewerUI.open(bufferedImage, 10000)
+    it should "shift the entire image" in {
+        bufferedFrameImage.shift(100, 400)
+        showScaledImage()
+    }
+
+    it should "shift a color band horizontally" in {
+        bufferedFrameImage.shiftColorBand(RED, 200, 0)
+        showScaledImage()
+    }
+
+    it should "shift a color band vertically" in {
+        bufferedFrameImage.shiftColorBand(RED, 0, 10)
+        showScaledImage()
+    }
+
+    private def showScaledImage() {
+        ImageViewerUI.open(createTestImage(), 1000)
+        ImageViewerUI.open(bufferedImage, 1000)
+        //ImageViewerUI.open(PixelUtils.scale(bufferedImage, 10, 10), 2000)
+    }
+
+    private def createTestImage() = {
+        val source = ImageIO.read(getClass.getResourceAsStream("/image.png"))
+        //val source = ImageIO.read(getClass.getResourceAsStream("/9x9.png"))
+        //renderTestImage(source
+        source
+    }
+
+    private def renderTestImage(source: BufferedImage) {
+        val raster = source.getRaster
+        for (x <- 0 to raster.getWidth - 1) {
+            for (y <- 0 to raster.getHeight - 1) {
+                val pixel = y % 3 match {
+                    case 0 => 0xff0000
+                    case 1 => 0x00ff00
+                    case 2 => 0x0000ff
+                }
+                if (x == 0) {
+                    source.setRGB(x, y, pixel)
+                } else {
+                    source.setRGB(x, y, 0)
+                }
+            }
+        }
     }
 }

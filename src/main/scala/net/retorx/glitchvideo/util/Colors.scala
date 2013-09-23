@@ -58,7 +58,7 @@ object GREEN extends Color {
 
 object BLUE extends Color {
 
-    def getBand: Int = 3
+    def getBand: Int = 2
 
     def getColorInPixel(rgb: Int) = ((rgb & 0xff0000) >> 16).toByte
 
