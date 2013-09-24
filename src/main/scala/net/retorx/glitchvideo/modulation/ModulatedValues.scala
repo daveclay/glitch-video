@@ -39,13 +39,17 @@ trait ModulatedValue[T] {
 
 class ModulatedIntValue(initialSource: ValueSource[Int]) extends ModulatedValue[Int] {
     def this(value: Int) {
-        this(new StaticIntModulation(value))
+        this(new StaticIntModulator(value))
     }
 
     setSource(initialSource)
 }
 
 class ModulatedBooleanValue(initialSource: ValueSource[Boolean]) extends ModulatedValue[Boolean] {
+
+    def this(value: Boolean) {
+        this(new StaticBooleanModulator(value))
+    }
     setSource(initialSource)
 }
 

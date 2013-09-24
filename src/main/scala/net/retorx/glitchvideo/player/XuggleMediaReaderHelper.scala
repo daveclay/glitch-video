@@ -2,9 +2,9 @@ package net.retorx.glitchvideo.player
 
 import com.xuggle.mediatool.IMediaReader
 
-object PlayMedia {
+object XuggleMediaReaderHelper {
 
-    def play(mediaReader: IMediaReader) {
+    def startReading(mediaReader: IMediaReader) {
         while (mediaReader.readPacket() == null) {}
     }
 }

@@ -5,15 +5,16 @@ import net.retorx.glitchvideo.util.RandomShit
 
 class ModulationSynchronizer {
 
-    var modulators = List[Modulation[AnyRef]]()
+    var modulators = List[Modulator[AnyRef]]()
 
-    def add(modulation: Modulation[AnyRef]) = {
+    def add(modulation: Modulator[AnyRef]) = {
         modulators = modulators ++ List(modulation)
         modulation
     }
 
     // Todo: the tick might need to take in the pixel info or frame image info in order to base any modulation
-    // values from the context of the video (like width and height)
+    // values from the context of the video (like width and height). Or a separate initialization, or FrameContext
+    // update call.
     def tick() {
         modulators.foreach(modulator => {
             modulator.tick()
@@ -31,22 +32,35 @@ trait ValueSource[T] {
 /**
  * A Modulation is a ValueSource that receives a tick notification to change
  */
-trait Modulation[T] extends ValueSource[T] {
-    def tick()
+abstract class Modulator[T] extends ValueSource[T] {
+
+    var tickEveryValue: ModulatedBooleanValue = null.asInstanceOf[ModulatedBooleanValue]
+    var value:T = null.asInstanceOf[T]
+
+    def tick() {
+        calculateValue()
+    }
+
+    def currentValue():T = {
+        if (tickEveryValue != null && tickEveryValue()) {
+            tick()
+        }
+        value
+    }
+
+    def calculateValue()
 }
 
-/**
- * A Modulation that does nothing on a tick notification
- */
-trait StaticValue[T] extends Modulation[T] {
-    def tick() {}
+class StaticBooleanModulator(staticValue: Boolean) extends Modulator[Boolean] {
+    value = staticValue
+    def calculateValue() {}
 }
-
 /**
  * An Int value that does not change (no modulation)
  */
-class StaticIntModulation(value: Int) extends StaticValue[Int] {
-    def currentValue() = value
+class StaticIntModulator(staticValue: Int) extends Modulator[Int] {
+    value = staticValue
+    def calculateValue() {}
 }
 
 class PercentageOfTime(initialNumber: ModulatedValue[Int],
@@ -71,83 +85,74 @@ class PercentageOfTime(initialNumber: ModulatedValue[Int],
     }
 }
 
-class RandomBooleanModulation() extends Modulation[Boolean] with RandomShit {
+class RandomBooleanModulator extends Modulator[Boolean] with RandomShit {
+    value = false
 
-    var value = false
-
-    def tick() {
+    def calculateValue() {
         value = random.nextBoolean()
     }
-
-    def currentValue() = value
 }
 
-class OccasionallyRandomBooleanModulation(percentageOfTime: PercentageOfTime) extends Modulation[Boolean] with RandomShit {
+class OccasionallyRandomBooleanModulator(percentageOfTime: PercentageOfTime) extends Modulator[Boolean] with RandomShit {
+    value = false
 
-    var value = false
-
-    def tick() {
+    def calculateValue() {
         if (percentageOfTime()) {
             value = random.nextBoolean()
         }
     }
-
-    def currentValue() = value
 }
 
 /**
  * A Modulation that occasionally changes values from some other ModulatedIntSource
  * @param percentageOfTime
- * @param value
+ * @param modulatedValue
  */
-class OccasionallyRandomIntModulation(percentageOfTime: PercentageOfTime,
-                                      value: ModulatedValue[Int]) extends Modulation[Int] with RandomShit {
-    var theValue = 0
-
-    def tick() {
+class OccasionallyRandomIntModulator(percentageOfTime: PercentageOfTime,
+                                     modulatedValue: ModulatedValue[Int]) extends Modulator[Int] with RandomShit {
+    def calculateValue() {
         if (percentageOfTime()) {
             // Todo: do I tick the ModulatedIntSource as well? OR is that taken care of? If someone else
             // does the ticking, then the ticks will continue regardless of whether I use the value, resulting
-            // in the values jumping more than I want. Imight want to only tick when occasionally picking the
+            // in the values jumping more than I want. I might want to only tick when occasionally picking the
             // next value. But that means I have to change how ticks are handled
-            theValue = value()
+            value = modulatedValue()
         }
     }
-
-    def currentValue() = theValue
 }
 
-class RandomIntModulation(lowest: ModulatedValue[Int],
-                          highest: ModulatedValue[Int]) extends Modulation[Int] with RandomShit {
+class RandomIntModulator(lowest: ModulatedValue[Int],
+                         highest: ModulatedValue[Int]) extends Modulator[Int] with RandomShit {
 
     def this(lowest: Int, highest: Int) {
         this(new ModulatedIntValue(lowest), new ModulatedIntValue(highest))
     }
 
-    var value = 0
+    value = 0
 
-    def tick() {
+    def calculateValue() {
         val low = lowest()
         val high = highest()
-        value = low + random.nextInt(high - low)
+        val maxRandom = high - low
+        if (maxRandom == 0) {
+            value = 0
+        } else {
+            value = low + random.nextInt(maxRandom)
+        }
     }
-
-    def currentValue() = value
 }
 
-class LFOIntModulation(period: ModulatedValue[Int],
-                       scale: ModulatedValue[Int]) extends Modulation[Int] {
+class LFOIntModulator(period: ModulatedValue[Int],
+                       scale: ModulatedValue[Int]) extends Modulator[Int] {
 
     def this(period: Int, scale: Int) {
         this(new ModulatedIntValue(period), new ModulatedIntValue(scale))
     }
 
     var count = 0
-    var value = 0
+    value = 0
 
-    def currentValue() = value
-
-    def tick() {
+    def calculateValue() {
         value = getValue(count, period(), scale())
         count += 1
         if (count >= period()) count = 0

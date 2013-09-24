@@ -11,20 +11,17 @@ import com.xuggle.mediatool.event.IVideoPictureEvent
 import net.retorx.glitchvideo.{FrameHandlerTool, GlitcherTool}
 import java.util.{Date, Random}
 
-class SwingPlayer(filename: String) {
+class SwingPlayer() {
 
-    val random = new Random(new Date().getTime)
-    val outputFilename = "/Users/daveclay/SYRIA/blah" + random.nextInt(1000) + ".mov"
-
-    def play() {
+    def play(filename: String, outputFilename: String) {
         val imageSource = new ImageSourceAdapter()
         val videoComponent = new VideoImageComponent(649, 480, imageSource)
 
         SwingUIHelper.openInFrame(videoComponent)
-        videoComponent.animate()
+        videoComponent.startPollingForFrames()
 
-        val glitchPlayer = new GlitchPlayer(imageSource)
-        glitchPlayer.glitch(filename, outputFilename)
+        val glitchPlayer = new GlitchPlayer(imageSource, outputFilename = outputFilename)
+        glitchPlayer.glitch(filename)
     }
 }
 
@@ -63,8 +60,8 @@ class VideoImageComponent(width: Int, height: Int, imageSource: ImageSource) ext
 
     setPreferredSize(new Dimension(width, height))
 
-    def animate() {
-        val framesPerSecond = 50
+    def startPollingForFrames() {
+        val framesPerSecond = 30
         val delay = 1000 / framesPerSecond
         val timer = new Timer(delay, null)
 
@@ -78,7 +75,7 @@ class VideoImageComponent(width: Int, height: Int, imageSource: ImageSource) ext
     }
 
     override def paintComponent(graphics: Graphics) {
-        val image = imageSource.getImage
+        val image = imageSource.nextImage
         if (image != null) {
             graphics.drawImage(image, 0, 0, null)
         }
@@ -86,34 +83,8 @@ class VideoImageComponent(width: Int, height: Int, imageSource: ImageSource) ext
 
 }
 
-trait ImageSource {
-    def getImage: BufferedImage
-}
 
-class ImageSourceAdapter extends MediaToolAdapter with ImageSource {
 
-    var image: BufferedImage = null
 
-    def getImage: BufferedImage = image
 
-    override def onVideoPicture(event: IVideoPictureEvent) {
-        image = event.getImage
-        super.onVideoPicture(event)
-    }
-}
 
-class GlitchPlayer(imageSourceAdapter: ImageSourceAdapter) {
-
-    def glitch(inputFilename: String, outputFilename: String) {
-        val mediaReader = ToolFactory.makeReader(inputFilename)
-        mediaReader.setBufferedImageTypeToGenerate(BufferedImage.TYPE_3BYTE_BGR)
-
-        val mediaWriter = ToolFactory.makeWriter(outputFilename, mediaReader)
-
-        val glitcher = new FrameHandlerTool()
-        mediaReader.addListener(glitcher)
-        glitcher.addListener(imageSourceAdapter)
-        imageSourceAdapter.addListener(mediaWriter)
-        PlayMedia.play(mediaReader)
-    }
-}

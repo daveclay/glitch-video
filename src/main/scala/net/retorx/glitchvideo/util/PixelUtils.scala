@@ -13,9 +13,9 @@ object PixelUtils {
         println(wrap(1, 300))
     }
 
-    def wrap(value: Int, max: Int) = {
+    def wrap(value: Int, max: Int): Int = {
         if (value >= max) {
-            value - max
+            wrap(value - max, max)
         } else {
             value
         }

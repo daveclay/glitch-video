@@ -38,7 +38,7 @@ trait ModulationTool extends MediaToolAdapter with FrameInfo {
     var initialized = false
 
     def addModulation(modulation: Any) {
-        modulationSync.add(modulation.asInstanceOf[Modulation[AnyRef]])
+        modulationSync.add(modulation.asInstanceOf[Modulator[AnyRef]])
     }
 
     override def onVideoPicture(event: IVideoPictureEvent) {
@@ -68,11 +68,11 @@ trait ModulationTool extends MediaToolAdapter with FrameInfo {
 
 class GlitcherTool extends ModulationTool {
 
-    val redShiftAmount = new ModulatedIntValue(new StaticIntModulation(10))
-    val greenShiftAmount = new ModulatedIntValue(new StaticIntModulation(100))
-    val period = new ModulatedIntValue(new StaticIntModulation(30))
-    val scale = new ModulatedIntValue(new StaticIntModulation(400))
-    val lfo = new LFOIntModulation(period, scale)
+    val redShiftAmount = new ModulatedIntValue(new StaticIntModulator(10))
+    val greenShiftAmount = new ModulatedIntValue(new StaticIntModulator(100))
+    val period = new ModulatedIntValue(new StaticIntModulator(30))
+    val scale = new ModulatedIntValue(new StaticIntModulator(400))
+    val lfo = new LFOIntModulator(period, scale)
 
     addModulation(lfo)
 
@@ -118,15 +118,18 @@ class GlitcherTool extends ModulationTool {
 
 class FrameHandlerTool extends ModulationTool {
 
-    val redShiftAmount = new ModulatedIntValue(new StaticIntModulation(10))
-    val greenShiftAmount = new ModulatedIntValue(new StaticIntModulation(100))
-    val period = new ModulatedIntValue(new StaticIntModulation(30))
-    val scale = new ModulatedIntValue(new StaticIntModulation(400))
-    val lfo = new LFOIntModulation(period, scale)
-    val blueShiftAmount = new ModulatedIntValue(lfo)
+    val redShiftAmount = new ModulatedIntValue(new StaticIntModulator(10))
+    val greenShiftAmount = new ModulatedIntValue(new StaticIntModulator(100))
+    val period = new ModulatedIntValue(new StaticIntModulator(30))
+    val scale = new ModulatedIntValue(new StaticIntModulator(400))
+    val lfo = new LFOIntModulator(period, scale)
+    val random = new RandomIntModulator(new ModulatedIntValue(0), new ModulatedIntValue(lfo))
+    val blueShiftAmount = new ModulatedIntValue(random)
+    addModulation(random)
     addModulation(lfo)
 
     var shiftColorBands = new ShiftColorBands2(Horizontal, redShiftAmount, greenShiftAmount, blueShiftAmount)
+    // var shiftColorBands = new ShiftIndividualScanlines(Horizontal, redShiftAmount, greenShiftAmount, blueShiftAmount)
 
     val frameHandler = shiftColorBands
 
