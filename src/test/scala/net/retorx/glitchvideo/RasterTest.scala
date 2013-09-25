@@ -21,7 +21,7 @@ import java.io.File
 class RasterTest extends FlatSpec with DefaultExampleExpectationsListener with Mockito with ShouldMatchers with OneInstancePerTest {
 
     val bufferedImage = createImage()
-    val bufferedFrameImage = new BufferedFrameImage(bufferedImage)
+    val bufferedFrameImage = new BufferedFrameImage(bufferedImage, 0)
 
     classOf[RasterTest].getName should "show how data is stored" in {
         view()

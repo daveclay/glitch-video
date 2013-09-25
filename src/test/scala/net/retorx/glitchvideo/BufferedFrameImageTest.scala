@@ -24,7 +24,7 @@ class BufferedFrameImageTest extends FlatSpec with DefaultExampleExpectationsLis
     // val bufferedFrameImage = new BufferedFrameImage(bufferedImage)
 
     val bufferedImage = createTestImage()
-    val bufferedFrameImage = new BufferedFrameImage(bufferedImage)
+    val bufferedFrameImage = new BufferedFrameImage(bufferedImage, 0)
 
     classOf[BufferedFrameImageTest].getName should "shift row" in {
         val row = 30

@@ -1,7 +1,7 @@
 package net.retorx.glitchvideo.glitches
 
 import net.retorx.glitchvideo.glitches.colorbands.{Horizontal, ShiftDirection}
-import net.retorx.glitchvideo.modulation.ModulatedIntValue
+import net.retorx.glitchvideo.modulation.{SyncData, ModulatedIntValue}
 import net.retorx.glitchvideo.util._
 
 class ShiftIndividualScanlines(shiftDirection: ShiftDirection = Horizontal,
@@ -11,7 +11,7 @@ class ShiftIndividualScanlines(shiftDirection: ShiftDirection = Horizontal,
         extends FrameHandler {
 
     def handleFrame(frameImage: FrameImage) {
-        new ShiftBandsAlgorithm(frameImage, RED, 0, blueShiftAmount).shift()
+        new ShiftBandsAlgorithm(calcSyncData(frameImage), frameImage, BLUE, 0, blueShiftAmount).shift()
     }
 }
 
@@ -25,7 +25,12 @@ class ShiftIndividualScanlines(shiftDirection: ShiftDirection = Horizontal,
  * @param distanceX
  * @param distanceY
  */
-class ShiftBandsAlgorithm(image:FrameImage, color: Color, distanceX: Int, distanceY: ModulatedIntValue) {
+class ShiftBandsAlgorithm(syncData: SyncData,
+                          image: FrameImage,
+                          color: Color,
+                          distanceX: Int,
+                          distanceY: ModulatedIntValue) {
+
     val raster = image.getWritableRaster
     val band = color.getBand
     val shiftedYs = new scala.collection.mutable.HashSet[Int]()
@@ -39,7 +44,7 @@ class ShiftBandsAlgorithm(image:FrameImage, color: Color, distanceX: Int, distan
         raster.getSamples(x, y, image.width, 1, band, samplesToShift)
         while (shiftedYs.size != raster.getHeight) {
             // where are we putting the copied samples?
-            val shiftedY = PixelUtils.wrap(nextY + distanceY(), image.height)
+            val shiftedY = PixelUtils.wrap(nextY + distanceY(syncData), image.height)
             // have we already shifted those samples?
             if (!shiftedYs.contains(shiftedY)) {
                 // copy the samples at the shiftedY location before we overwrite them

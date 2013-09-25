@@ -12,15 +12,16 @@ class ShiftColorBands2(shiftDirection: ShiftDirection = Horizontal,
         extends FrameHandler {
 
     def handleFrame(frameImage: FrameImage) {
+        val syncData = calcSyncData(frameImage)
         // Todo: This will never shift individual pixels randomly.
-        if (blueShiftAmount() > 0) {
-            frameImage.shiftColorBand(BLUE, 0, blueShiftAmount())
+        if (blueShiftAmount(syncData) > 0) {
+            frameImage.shiftColorBand(BLUE, 0, blueShiftAmount(syncData))
         }
-        if (redShiftAmount() > 0) {
-            frameImage.shiftColorBand(RED, 0, redShiftAmount())
+        if (redShiftAmount(syncData) > 0) {
+            frameImage.shiftColorBand(RED, 0, redShiftAmount(syncData))
         }
-        if (greenShiftAmount() > 0) {
-            frameImage.shiftColorBand(GREEN, 0, greenShiftAmount())
+        if (greenShiftAmount(syncData) > 0) {
+            frameImage.shiftColorBand(GREEN, 0, greenShiftAmount(syncData))
         }
     }
 }

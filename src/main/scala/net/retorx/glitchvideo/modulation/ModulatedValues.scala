@@ -29,8 +29,8 @@ package net.retorx.glitchvideo.modulation
 trait ModulatedValue[T] {
     var valueSource: ValueSource[T] = null
 
-    def value() =  valueSource.currentValue()
-    def apply() = value()
+    def value(syncData: SyncData) =  valueSource.getValue(syncData)
+    def apply(syncData: SyncData) = value(syncData)
 
     def setSource(source: ValueSource[T]) {
         this.valueSource = source

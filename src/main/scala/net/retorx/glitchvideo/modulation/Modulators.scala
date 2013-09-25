@@ -1,66 +1,90 @@
 package net.retorx.glitchvideo.modulation
 
 import net.retorx.glitchvideo.util.SineWave._
-import net.retorx.glitchvideo.util.RandomShit
+import net.retorx.glitchvideo.util.{SineWave, RandomShit}
+import java.util.Random
 
-class ModulationSynchronizer {
-
-    var modulators = List[Modulator[AnyRef]]()
-
-    def add(modulation: Modulator[AnyRef]) = {
-        modulators = modulators ++ List(modulation)
-        modulation
-    }
-
-    // Todo: the tick might need to take in the pixel info or frame image info in order to base any modulation
-    // values from the context of the video (like width and height). Or a separate initialization, or FrameContext
-    // update call.
-    def tick() {
-        modulators.foreach(modulator => {
-            modulator.tick()
-        })
-    }
-}
+case class SyncData(frameId: Long, pixelId: Long, colorBandId: Long, arbitraryData: Map[String, Long])
 
 /**
- * A ValueSource is a variable
+ * A ValueSource is a variable; this interface is exposed to the effects that have "inputs" or required values
+ * to apply the effect. A separate interface ensures effect code adheres to a simple value API, rather than being
+ * exposed to the internal modulation APIs.
  */
 trait ValueSource[T] {
-    def currentValue(): T
+    def getValue(syncData: SyncData): T
+}
+
+trait SyncType
+
+/**
+ * Sync based on every X frames
+ */
+object FrameSync extends SyncType
+
+/**
+ * Sync based on every X pixels
+ */
+object PixelSync extends SyncType
+
+/**
+ * Sync based on every X color bands
+ */
+object ColorBandSync extends SyncType
+
+/**
+ * Sync based on a free-running timer
+ */
+object FreeTimeSync extends SyncType
+
+/**
+ * Sync defined by an effect (e.g. the effect defines regions of the video frame, and can be synced based on every
+ * X region). This would use the arbitrary data Map in the SyncData, provided by the effect.
+ */
+object EffectSync extends SyncType
+
+/**
+ * Information about the sync type
+ */
+trait SyncConfig {
+    def getSyncType: SyncType
 }
 
 /**
  * A Modulation is a ValueSource that receives a tick notification to change
  */
 abstract class Modulator[T] extends ValueSource[T] {
+    var syncType: SyncType = null
 
-    var tickEveryValue: ModulatedBooleanValue = null.asInstanceOf[ModulatedBooleanValue]
-    var value:T = null.asInstanceOf[T]
+    def getSyncType = syncType
 
-    def tick() {
-        calculateValue()
+    def setSyncType(syncType: SyncType) {
+        this.syncType = syncType
     }
 
-    def currentValue():T = {
-        if (tickEveryValue != null && tickEveryValue()) {
-            tick()
+    def rngWithSeed(seed: Long) = new Random(seed)
+
+    def hi(syncData: SyncData) {
+        syncType match {
+            case FrameSync => rngWithSeed(syncData.frameId << 64)
+            case PixelSync => rngWithSeed(syncData.frameId << 64 | syncData.pixelId << 64)
+            case ColorBandSync =>
+            case FreeTimeSync =>
+            case EffectSync =>
         }
-        value
     }
 
-    def calculateValue()
+    def getValue(syncData: SyncData):T
 }
 
 class StaticBooleanModulator(staticValue: Boolean) extends Modulator[Boolean] {
-    value = staticValue
-    def calculateValue() {}
+    def getValue(syncData: SyncData): Boolean = staticValue
 }
 /**
  * An Int value that does not change (no modulation)
  */
 class StaticIntModulator(staticValue: Int) extends Modulator[Int] {
-    value = staticValue
-    def calculateValue() {}
+    def getValue(syncData: SyncData): Int = staticValue
 }
 
 class PercentageOfTime(initialNumber: ModulatedValue[Int],
@@ -78,28 +102,29 @@ class PercentageOfTime(initialNumber: ModulatedValue[Int],
         this.number = number
     }
 
-    def apply() = get()
+    def apply(syncData: SyncData) = get(syncData)
 
-    def get() = {
-        number() > random.nextInt(outOfTotal())
+    def get(syncData: SyncData) = {
+        number(syncData) > random.nextInt(outOfTotal(syncData))
     }
 }
 
-class RandomBooleanModulator extends Modulator[Boolean] with RandomShit {
-    value = false
+class RandomBooleanModulator extends Modulator[Boolean] {
+
+    def getValue(syncData: SyncData): Boolean = false
 
     def calculateValue() {
-        value = random.nextBoolean()
+        // value = random.nextBoolean()
     }
 }
 
 class OccasionallyRandomBooleanModulator(percentageOfTime: PercentageOfTime) extends Modulator[Boolean] with RandomShit {
-    value = false
 
-    def calculateValue() {
-        if (percentageOfTime()) {
-            value = random.nextBoolean()
+    def getValue(syncData: SyncData): Boolean = {
+        if (percentageOfTime(syncData)) {
+            random.nextBoolean()
         }
+        false
     }
 }
 
@@ -109,53 +134,54 @@ class OccasionallyRandomBooleanModulator(percentageOfTime: PercentageOfTime) ext
  * @param modulatedValue
  */
 class OccasionallyRandomIntModulator(percentageOfTime: PercentageOfTime,
-                                     modulatedValue: ModulatedValue[Int]) extends Modulator[Int] with RandomShit {
-    def calculateValue() {
-        if (percentageOfTime()) {
+                                     modulatedValue: ModulatedIntValue) extends Modulator[Int] with RandomShit {
+
+    def getValue(syncData: SyncData) = {
+        if (percentageOfTime(syncData)) {
             // Todo: do I tick the ModulatedIntSource as well? OR is that taken care of? If someone else
             // does the ticking, then the ticks will continue regardless of whether I use the value, resulting
             // in the values jumping more than I want. I might want to only tick when occasionally picking the
             // next value. But that means I have to change how ticks are handled
-            value = modulatedValue()
+            modulatedValue(syncData)
         }
+        0
     }
+
 }
 
-class RandomIntModulator(lowest: ModulatedValue[Int],
-                         highest: ModulatedValue[Int]) extends Modulator[Int] with RandomShit {
+class RandomIntModulator(lowest: ModulatedIntValue,
+                         highest: ModulatedIntValue) extends Modulator[Int] with RandomShit {
 
     def this(lowest: Int, highest: Int) {
         this(new ModulatedIntValue(lowest), new ModulatedIntValue(highest))
     }
 
-    value = 0
-
-    def calculateValue() {
-        val low = lowest()
-        val high = highest()
+    def getValue(syncData: SyncData): Int = {
+        val low = lowest(syncData)
+        val high = highest(syncData)
         val maxRandom = high - low
         if (maxRandom == 0) {
-            value = 0
+            0
         } else {
-            value = low + random.nextInt(maxRandom)
+            low + random.nextInt(maxRandom)
         }
     }
 }
 
-class LFOIntModulator(period: ModulatedValue[Int],
-                       scale: ModulatedValue[Int]) extends Modulator[Int] {
+class LFOIntModulator(period: ModulatedIntValue,
+                       scale: ModulatedIntValue) extends Modulator[Int] {
 
     def this(period: Int, scale: Int) {
         this(new ModulatedIntValue(period), new ModulatedIntValue(scale))
     }
 
     var count = 0
-    value = 0
 
-    def calculateValue() {
-        value = getValue(count, period(), scale())
+    def getValue(syncData: SyncData): Int = {
+        val next = SineWave.getValue(count, period(syncData), scale(syncData))
         count += 1
-        if (count >= period()) count = 0
+        if (count >= period(syncData)) count = 0
+        next
     }
 }
 

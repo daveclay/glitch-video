@@ -25,7 +25,7 @@ trait FrameInfo {
         frameCount += 1
         if (frameCount % 30 == 0) {
             val now = System.currentTimeMillis()
-            val average = ((now - start) / frameCount)
+            val average = (now - start) / frameCount
             val fps = 1000 / average
             println(frameCount + " frames " + (now - start) + "ms @ " + average + " per frame " + fps + " fps")
         }
@@ -34,7 +34,7 @@ trait FrameInfo {
 }
 
 trait ModulationTool extends MediaToolAdapter with FrameInfo {
-    val modulationSync = new ModulationSynchronizer()
+    val modulationSync = new ModulationClock()
     var initialized = false
 
     def addModulation(modulation: Any) {
@@ -46,15 +46,6 @@ trait ModulationTool extends MediaToolAdapter with FrameInfo {
             initFrameInfo()
             initialized = true
         }
-
-        /*
-            TODO: ticks must be configurable.
-            ticks can happen on each frame, each pixel of each frame, maybe arbitrarily?
-            Can the tick configuration be modulated? Sure.
-
-            The thing that triggers the ticks - it needs access to each frame and each pixel of each frame.
-         */
-        modulationSync.tick()
 
         val image = event.getImage
         handleFrameImage(image)
@@ -128,13 +119,16 @@ class FrameHandlerTool extends ModulationTool {
     addModulation(random)
     addModulation(lfo)
 
-    var shiftColorBands = new ShiftColorBands2(Horizontal, redShiftAmount, greenShiftAmount, blueShiftAmount)
-    // var shiftColorBands = new ShiftIndividualScanlines(Horizontal, redShiftAmount, greenShiftAmount, blueShiftAmount)
+    //var shiftColorBands = new ShiftColorBands2(Horizontal, redShiftAmount, greenShiftAmount, blueShiftAmount)
+    var shiftColorBands = new ShiftIndividualScanlines(Horizontal, redShiftAmount, greenShiftAmount, blueShiftAmount)
 
     val frameHandler = shiftColorBands
 
+    var frameIdx = 0L
+
     def handleFrameImage(image: BufferedImage) {
-        frameHandler.handleFrame(new BufferedFrameImage(image))
+        frameHandler.handleFrame(new BufferedFrameImage(image, frameIdx))
+        frameIdx += 1
     }
 }
 

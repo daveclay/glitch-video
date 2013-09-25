@@ -40,8 +40,7 @@ object XuggleFilePlayer {
 class XugglerVideoPlayer {
 
     def play(filename: String, outputFilename: String) {
-        val imageSourceAdapter =new ImageSourceAdapter()
-        val glitchPlayer = new GlitchPlayer(outputFilename = outputFilename, imageSourceAdapter = imageSourceAdapter, useXugglerViewer = true)
+        val glitchPlayer = new GlitchPlayer(outputFilename = outputFilename, useXugglerViewer = true)
         glitchPlayer.glitch(filename)
     }
 }

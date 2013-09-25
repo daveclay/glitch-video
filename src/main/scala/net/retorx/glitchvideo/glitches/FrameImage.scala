@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform
 
 trait FrameImage {
 
+    val frameId: Long
     val height: Int
     val width: Int
     def getPixel(x: Int, y: Int): Int
@@ -26,11 +27,12 @@ trait FrameImage {
     def getWritableRaster: WritableRaster
 }
 
-class BufferedFrameImage(image: BufferedImage) extends FrameImage {
+class BufferedFrameImage(image: BufferedImage, theFrameId: Long) extends FrameImage {
 
     val raster = image.getRaster
     val width = raster.getWidth
     val height = raster.getHeight
+    val frameId: Long = theFrameId
 
     def getPixel(x: Int, y: Int) = image.getRGB(x, y)
 

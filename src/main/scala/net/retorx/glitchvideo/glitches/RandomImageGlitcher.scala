@@ -2,6 +2,7 @@ package net.retorx.glitchvideo.glitches
 
 import java.awt.image.BufferedImage
 import net.retorx.glitchvideo.util.RandomShit
+import net.retorx.glitchvideo.modulation.SyncData
 
 trait RandomImageGlitcher extends RandomShit {
 
@@ -13,5 +14,6 @@ trait RandomImageGlitcher extends RandomShit {
 }
 
 trait FrameHandler {
+    def calcSyncData(frameImage: FrameImage) = SyncData(frameImage.frameId, 0, 0, null.asInstanceOf[Map[String, Long]])
     def handleFrame(frameImage: FrameImage)
 }
