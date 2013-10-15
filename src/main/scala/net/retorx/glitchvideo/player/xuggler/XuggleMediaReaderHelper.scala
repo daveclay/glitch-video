@@ -1,4 +1,4 @@
-package net.retorx.glitchvideo.player
+package net.retorx.glitchvideo.player.xuggler
 
 import com.xuggle.mediatool.IMediaReader
 

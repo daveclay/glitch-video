@@ -2,23 +2,30 @@ package net.retorx.glitchvideo.player
 
 import com.xuggle.mediatool.MediaToolAdapter
 import java.awt.image.BufferedImage
-import com.xuggle.mediatool.event.IVideoPictureEvent
+import com.xuggle.mediatool.event.{IAddStreamEvent, IVideoPictureEvent}
 import scala.collection.mutable
 
 class ImageSourceAdapter extends MediaToolAdapter with ImageSource {
 
-    val imageQueue = new mutable.Queue[BufferedImage]()
+    val frameImages = new mutable.ListBuffer[BufferedImage]()
+    var index = 0
     var lastImage: BufferedImage = null
 
     def nextImage: BufferedImage = {
-        if (imageQueue.size > 0) {
-            lastImage = imageQueue.dequeue()
+        if (frameImages.size > 0) {
+            lastImage = frameImages(index)
+            index += 1
         }
         lastImage
     }
 
+    override def onAddStream(event: IAddStreamEvent) {
+        event.getSource.getContainer.getDuration
+        super.onAddStream(event)
+    }
+
     override def onVideoPicture(event: IVideoPictureEvent) {
-        imageQueue += event.getImage
+        frameImages += event.getImage
         super.onVideoPicture(event)
     }
 }

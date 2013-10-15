@@ -17,15 +17,39 @@
         <scala.version>2.10.0</scala.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>daveclay-releases</id>
+            <name>daveclay repo</name>
+            <url>http://daveclay.com/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>daveclay-snapshots</id>
+            <name>daveclay repo</name>
+            <url>http://daveclay.com/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>com.springsource.repository.bundles.external</id>
             <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
             <url>http://repository.springsource.com/maven/bundles/external</url>
         </repository>
+        <repository>
+            <id>daveclay-releases</id>
+            <name>daveclay repo</name>
+            <url>http://daveclay.com/nexus/content/repositories/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.daveclay</groupId>
+            <artifactId>swing-junk</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
         <dependency>
             <groupId>xuggle</groupId>

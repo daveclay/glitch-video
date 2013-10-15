@@ -10,12 +10,12 @@ import org.scalatest.matchers.ShouldMatchers
 import net.retorx.glitchvideo.glitches.BufferedFrameImage
 import javax.imageio.ImageIO
 import net.retorx.glitchvideo.util.{GREEN, RED, PixelUtils}
-import net.retorx.glitchvideo.player.ImageViewerUI
 import java.awt.image.{AffineTransformOp, BufferedImage}
 import java.awt.geom.AffineTransform
 import java.awt.{Image, Rectangle}
 import sun.awt.image.ByteInterleavedRaster
 import java.io.File
+import net.retorx.glitchvideo.ui.ImageViewerUI
 
 @RunWith(classOf[JUnitRunner])
 class RasterTest extends FlatSpec with DefaultExampleExpectationsListener with Mockito with ShouldMatchers with OneInstancePerTest {

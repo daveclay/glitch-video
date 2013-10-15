@@ -1,15 +1,9 @@
-package net.retorx.glitchvideo.player
+package net.retorx.glitchvideo.ui
 
 import java.awt.{Image, Graphics, Dimension, Component}
-import java.awt.image.BufferedImage
 import javax.swing.{JPanel, Timer, JFrame, JApplet}
 import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowAdapter}
-import java.net.{MalformedURLException, URL}
-import java.io.File
-import com.xuggle.mediatool.{ToolFactory, MediaToolAdapter}
-import com.xuggle.mediatool.event.IVideoPictureEvent
-import net.retorx.glitchvideo.{FrameHandlerTool, GlitcherTool}
-import java.util.{Date, Random}
+import net.retorx.glitchvideo.player.{ImageSource, GlitchPlayer, ImageSourceAdapter}
 
 class SwingPlayer() {
 

@@ -14,8 +14,8 @@ import scala.collection.mutable.ListBuffer
 import net.retorx.glitchvideo.glitches.BufferedFrameImage
 import javax.imageio.ImageIO
 import net.retorx.glitchvideo.util.{BLUE, GREEN, RED, PixelUtils}
-import net.retorx.glitchvideo.player.ImageViewerUI
 import java.awt.image.BufferedImage
+import net.retorx.glitchvideo.ui.ImageViewerUI
 
 @RunWith(classOf[JUnitRunner])
 class BufferedFrameImageTest extends FlatSpec with DefaultExampleExpectationsListener with Mockito with ShouldMatchers with OneInstancePerTest {

@@ -4,8 +4,9 @@ import com.xuggle.mediatool.{IMediaReader, MediaToolAdapter, ToolFactory}
 import java.awt.image.{Raster, BufferedImage}
 import com.xuggle.mediatool.event.IVideoPictureEvent
 import java.util.{Date, Random}
-import net.retorx.glitchvideo.player.{XugglerVideoPlayer, SwingPlayer, XuggleMediaReaderHelper, XuggleFilePlayer}
+import net.retorx.glitchvideo.player.xuggler.XuggleMediaReaderHelper
 import XuggleMediaReaderHelper._
+import net.retorx.glitchvideo.ui.SwingPlayer
 
 object Main {
 

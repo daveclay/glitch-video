@@ -1,6 +1,7 @@
-package net.retorx.glitchvideo.player
+package net.retorx.glitchvideo.player.xuggler
 
 import com.xuggle.mediatool.ToolFactory
+import net.retorx.glitchvideo.player.GlitchPlayer
 
 class XuggleFilePlayer(filename: String) {
 
