@@ -2,7 +2,6 @@ package net.retorx.glitchvideo.ui
 
 import java.awt.{Image, Graphics, Dimension, Component}
 import javax.swing.{JPanel, Timer, JFrame, JApplet}
-import java.awt.event.{ActionEvent, ActionListener, WindowEvent, WindowAdapter}
 import net.retorx.glitchvideo.player.{ImageSource, GlitchPlayer, ImageSourceAdapter}
 
 class SwingPlayer() {
@@ -12,7 +11,7 @@ class SwingPlayer() {
         val videoComponent = new VideoImageComponent(649, 480, imageSource)
 
         SwingUIHelper.openInFrame(videoComponent)
-        videoComponent.startPollingForFrames()
+        videoComponent.play()
 
         val glitchPlayer = new GlitchPlayer(imageSource, outputFilename = outputFilename)
         glitchPlayer.glitch(filename)
@@ -38,43 +37,6 @@ object ImageViewerUI {
         SwingUIHelper.openInFrame(new ImageComponent(image))
         Thread.sleep(time)
     }
-}
-
-class ImageComponent(image: Image) extends JPanel {
-    private val iWidth = image.getWidth(null)
-    private val iHeight = image.getHeight(null)
-    setPreferredSize(new Dimension(iWidth, iHeight))
-
-    override def paintComponent(graphics: Graphics) {
-        graphics.drawImage(image, 0, 0, null)
-    }
-}
-
-class VideoImageComponent(width: Int, height: Int, imageSource: ImageSource) extends JPanel {
-
-    setPreferredSize(new Dimension(width, height))
-
-    def startPollingForFrames() {
-        val framesPerSecond = 30
-        val delay = 1000 / framesPerSecond
-        val timer = new Timer(delay, null)
-
-        timer.addActionListener(new ActionListener {
-            def actionPerformed(e: ActionEvent) {
-                repaint()
-            }
-        })
-
-        timer.start()
-    }
-
-    override def paintComponent(graphics: Graphics) {
-        val image = imageSource.nextImage
-        if (image != null) {
-            graphics.drawImage(image, 0, 0, null)
-        }
-    }
-
 }
 
 

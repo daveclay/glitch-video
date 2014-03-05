@@ -8,15 +8,13 @@ import scala.collection.mutable
 class ImageSourceAdapter extends MediaToolAdapter with ImageSource {
 
     val frameImages = new mutable.ListBuffer[BufferedImage]()
-    var index = 0
-    var lastImage: BufferedImage = null
 
-    def nextImage: BufferedImage = {
-        if (frameImages.size > 0) {
-            lastImage = frameImages(index)
-            index += 1
+    def getImageAt(index: Int): BufferedImage = {
+        if (frameImages.size > index) {
+            frameImages(index)
+        } else {
+            null
         }
-        lastImage
     }
 
     override def onAddStream(event: IAddStreamEvent) {
